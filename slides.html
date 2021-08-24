@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Is anyone here a doctor (of philosophy?)</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Kai Aragaki" />
+    <meta name="date" content="2021-08-24" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/plotly-binding/plotly.js"></script>
+    <script src="libs/typedarray/typedarray.min.js"></script>
+    <script src="libs/jquery/jquery.min.js"></script>
+    <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+    <link href="libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="libs/plotly-main/plotly-latest.min.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Is anyone here a doctor (of philosophy?)
+## Investigating PhDs over time
+### Kai Aragaki
+### 2021-08-24
+
+---
+
+
+
+
+# The Question
+
+- Which PhDs are rising in popularity? 
+- Which are becoming less popular?
+
+---
+
+# The Data
+
+- These data were obtained from the [NSF](https://ncses.nsf.gov/pubs/nsf19301/data), with a tidying script from the [TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-02-19) repository.
+
+---
+
+# The Data: A peek
+
+
+|broad_field   |major_field                                 |field                                         | year| n_phds|
+|:-------------|:-------------------------------------------|:---------------------------------------------|----:|------:|
+|Life sciences |Agricultural sciences and natural resources |Agricultural economics                        | 2008|    111|
+|Life sciences |Agricultural sciences and natural resources |Agricultural and horticultural plant breeding | 2008|     28|
+|Life sciences |Agricultural sciences and natural resources |Agricultural animal breeding                  | 2008|      3|
+|Life sciences |Agricultural sciences and natural resources |Agronomy and crop science                     | 2008|     68|
+|Life sciences |Agricultural sciences and natural resources |Animal nutrition                              | 2008|     41|
+|Life sciences |Agricultural sciences and natural resources |Animal science, poultry or avian              | 2008|     18|
+
+---
+
+# Finding the biggest differences
+
+
+```r
+phd_field &lt;- phd_field |&gt; 
+  group_by(field) |&gt; 
+  dplyr::arrange(year) |&gt; 
+  mutate(diff = n_phds[n()] - n_phds[1]) |&gt; 
+  filter(!is.na(diff)) |&gt; 
+  arrange(diff) |&gt; 
+  nest()
+
+
+best_worst &lt;- bind_rows(head(phd_field, 5), tail(phd_field, 5)) |&gt; 
+  unnest(cols = c(data))
+
+head(best_worst) |&gt; kable()
+```
+
+
+
+|field                  |broad_field |major_field              | year| n_phds| diff|
+|:----------------------|:-----------|:------------------------|----:|------:|----:|
+|Educational leadership |Education   |Education administration | 2008|   1573| -982|
+|Educational leadership |Education   |Education administration | 2009|   1561| -982|
+|Educational leadership |Education   |Education administration | 2010|   1029| -982|
+|Educational leadership |Education   |Education administration | 2011|    649| -982|
+|Educational leadership |Education   |Education administration | 2012|    673| -982|
+|Educational leadership |Education   |Education administration | 2013|    601| -982|
+
+---
+
+# Plotting the differences
+
+Since they're all on their own scales, it's difficult to see exactly what's going on...
+
+<div id="htmlwidget-a161599c09685da1b34e" style="width:100%;height:60%;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a161599c09685da1b34e">{"x":{"data":[{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[483,503,507,553,547,550,185,99,90,110],"text":["year: 2008<br />n_phds:  483<br />field: Anthropology, generalj","year: 2009<br />n_phds:  503<br />field: Anthropology, generalj","year: 2010<br />n_phds:  507<br />field: Anthropology, generalj","year: 2011<br />n_phds:  553<br />field: Anthropology, generalj","year: 2012<br />n_phds:  547<br />field: Anthropology, generalj","year: 2013<br />n_phds:  550<br />field: Anthropology, generalj","year: 2014<br />n_phds:  185<br />field: Anthropology, generalj","year: 2015<br />n_phds:   99<br />field: Anthropology, generalj","year: 2016<br />n_phds:   90<br />field: Anthropology, generalj","year: 2017<br />n_phds:  110<br />field: Anthropology, generalj"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"Anthropology, generalj","legendgroup":"Anthropology, generalj","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[150,173,184,168,223,256,245,258,770,391],"text":["year: 2008<br />n_phds:  150<br />field: Biological and biomedical sciences, general","year: 2009<br />n_phds:  173<br />field: Biological and biomedical sciences, general","year: 2010<br />n_phds:  184<br />field: Biological and biomedical sciences, general","year: 2011<br />n_phds:  168<br />field: Biological and biomedical sciences, general","year: 2012<br />n_phds:  223<br />field: Biological and biomedical sciences, general","year: 2013<br />n_phds:  256<br />field: Biological and biomedical sciences, general","year: 2014<br />n_phds:  245<br />field: Biological and biomedical sciences, general","year: 2015<br />n_phds:  258<br />field: Biological and biomedical sciences, general","year: 2016<br />n_phds:  770<br />field: Biological and biomedical sciences, general","year: 2017<br />n_phds:  391<br />field: Biological and biomedical sciences, general"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(216,144,0,1)","dash":"solid"},"hoveron":"points","name":"Biological and biomedical sciences, general","legendgroup":"Biological and biomedical sciences, general","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[271,298,269,289,290,364,416,399,412,539],"text":["year: 2008<br />n_phds:  271<br />field: Chemistry, general","year: 2009<br />n_phds:  298<br />field: Chemistry, general","year: 2010<br />n_phds:  269<br />field: Chemistry, general","year: 2011<br />n_phds:  289<br />field: Chemistry, general","year: 2012<br />n_phds:  290<br />field: Chemistry, general","year: 2013<br />n_phds:  364<br />field: Chemistry, general","year: 2014<br />n_phds:  416<br />field: Chemistry, general","year: 2015<br />n_phds:  399<br />field: Chemistry, general","year: 2016<br />n_phds:  412<br />field: Chemistry, general","year: 2017<br />n_phds:  539<br />field: Chemistry, general"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(163,165,0,1)","dash":"solid"},"hoveron":"points","name":"Chemistry, general","legendgroup":"Chemistry, general","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[744,782,617,590,583,586,552,585,380,514],"text":["year: 2008<br />n_phds:  744<br />field: Curriculum and instruction","year: 2009<br />n_phds:  782<br />field: Curriculum and instruction","year: 2010<br />n_phds:  617<br />field: Curriculum and instruction","year: 2011<br />n_phds:  590<br />field: Curriculum and instruction","year: 2012<br />n_phds:  583<br />field: Curriculum and instruction","year: 2013<br />n_phds:  586<br />field: Curriculum and instruction","year: 2014<br />n_phds:  552<br />field: Curriculum and instruction","year: 2015<br />n_phds:  585<br />field: Curriculum and instruction","year: 2016<br />n_phds:  380<br />field: Curriculum and instruction","year: 2017<br />n_phds:  514<br />field: Curriculum and instruction"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(57,182,0,1)","dash":"solid"},"hoveron":"points","name":"Curriculum and instruction","legendgroup":"Curriculum and instruction","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[665,585,320,217,219,187,170,169,148,176],"text":["year: 2008<br />n_phds:  665<br />field: Educational administration and supervision","year: 2009<br />n_phds:  585<br />field: Educational administration and supervision","year: 2010<br />n_phds:  320<br />field: Educational administration and supervision","year: 2011<br />n_phds:  217<br />field: Educational administration and supervision","year: 2012<br />n_phds:  219<br />field: Educational administration and supervision","year: 2013<br />n_phds:  187<br />field: Educational administration and supervision","year: 2014<br />n_phds:  170<br />field: Educational administration and supervision","year: 2015<br />n_phds:  169<br />field: Educational administration and supervision","year: 2016<br />n_phds:  148<br />field: Educational administration and supervision","year: 2017<br />n_phds:  176<br />field: Educational administration and supervision"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,125,1)","dash":"solid"},"hoveron":"points","name":"Educational administration and supervision","legendgroup":"Educational administration and supervision","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[1573,1561,1029,649,673,601,605,620,554,591],"text":["year: 2008<br />n_phds: 1573<br />field: Educational leadership","year: 2009<br />n_phds: 1561<br />field: Educational leadership","year: 2010<br />n_phds: 1029<br />field: Educational leadership","year: 2011<br />n_phds:  649<br />field: Educational leadership","year: 2012<br />n_phds:  673<br />field: Educational leadership","year: 2013<br />n_phds:  601<br />field: Educational leadership","year: 2014<br />n_phds:  605<br />field: Educational leadership","year: 2015<br />n_phds:  620<br />field: Educational leadership","year: 2016<br />n_phds:  554<br />field: Educational leadership","year: 2017<br />n_phds:  591<br />field: Educational leadership"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"Educational leadership","legendgroup":"Educational leadership","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[140,173,163,143,192,234,235,243,686,394],"text":["year: 2008<br />n_phds:  140<br />field: Mathematics and statistics, general","year: 2009<br />n_phds:  173<br />field: Mathematics and statistics, general","year: 2010<br />n_phds:  163<br />field: Mathematics and statistics, general","year: 2011<br />n_phds:  143<br />field: Mathematics and statistics, general","year: 2012<br />n_phds:  192<br />field: Mathematics and statistics, general","year: 2013<br />n_phds:  234<br />field: Mathematics and statistics, general","year: 2014<br />n_phds:  235<br />field: Mathematics and statistics, general","year: 2015<br />n_phds:  243<br />field: Mathematics and statistics, general","year: 2016<br />n_phds:  686<br />field: Mathematics and statistics, general","year: 2017<br />n_phds:  394<br />field: Mathematics and statistics, general"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,176,246,1)","dash":"solid"},"hoveron":"points","name":"Mathematics and statistics, general","legendgroup":"Mathematics and statistics, general","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[786,763,697,716,620,646,670,632,549,624],"text":["year: 2008<br />n_phds:  786<br />field: Molecular biology","year: 2009<br />n_phds:  763<br />field: Molecular biology","year: 2010<br />n_phds:  697<br />field: Molecular biology","year: 2011<br />n_phds:  716<br />field: Molecular biology","year: 2012<br />n_phds:  620<br />field: Molecular biology","year: 2013<br />n_phds:  646<br />field: Molecular biology","year: 2014<br />n_phds:  670<br />field: Molecular biology","year: 2015<br />n_phds:  632<br />field: Molecular biology","year: 2016<br />n_phds:  549<br />field: Molecular biology","year: 2017<br />n_phds:  624<br />field: Molecular biology"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(149,144,255,1)","dash":"solid"},"hoveron":"points","name":"Molecular biology","legendgroup":"Molecular biology","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[1586,1630,1563,1700,1788,1810,1850,1924,2006,1883],"text":["year: 2008<br />n_phds: 1586<br />field: Physics","year: 2009<br />n_phds: 1630<br />field: Physics","year: 2010<br />n_phds: 1563<br />field: Physics","year: 2011<br />n_phds: 1700<br />field: Physics","year: 2012<br />n_phds: 1788<br />field: Physics","year: 2013<br />n_phds: 1810<br />field: Physics","year: 2014<br />n_phds: 1850<br />field: Physics","year: 2015<br />n_phds: 1924<br />field: Physics","year: 2016<br />n_phds: 2006<br />field: Physics","year: 2017<br />n_phds: 1883<br />field: Physics"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(231,107,243,1)","dash":"solid"},"hoveron":"points","name":"Physics","legendgroup":"Physics","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[4278,4473,4462,4645,4899,4988,5027,5302,5129,5119],"text":["year: 2008<br />n_phds: 4278<br />field: Social sciences","year: 2009<br />n_phds: 4473<br />field: Social sciences","year: 2010<br />n_phds: 4462<br />field: Social sciences","year: 2011<br />n_phds: 4645<br />field: Social sciences","year: 2012<br />n_phds: 4899<br />field: Social sciences","year: 2013<br />n_phds: 4988<br />field: Social sciences","year: 2014<br />n_phds: 5027<br />field: Social sciences","year: 2015<br />n_phds: 5302<br />field: Social sciences","year: 2016<br />n_phds: 5129<br />field: Social sciences","year: 2017<br />n_phds: 5119<br />field: Social sciences"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(255,98,188,1)","dash":"solid"},"hoveron":"points","name":"Social sciences","legendgroup":"Social sciences","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":23.3059360730594,"r":7.30593607305936,"b":37.2602739726027,"l":48.9497716894977},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[2007.55,2017.45],"tickmode":"array","ticktext":["2010.0","2012.5","2015.0"],"tickvals":[2010,2012.5,2015],"categoryorder":"array","categoryarray":["2010.0","2012.5","2015.0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-170.6,5562.6],"tickmode":"array","ticktext":["0","2000","4000"],"tickvals":[0,2000,4000],"categoryorder":"array","categoryarray":["0","2000","4000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"n_phds","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.938132733408324},"annotations":[{"text":"field","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"40c05ba43ae9":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"40c05ba43ae9","visdat":{"40c05ba43ae9":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+
+---
+
+# Plotting the differences
+
+We can make a new metric by dividing every number by it's first year's value for that field
+
+
+```r
+best_worst_ratio &lt;- best_worst |&gt; 
+  mutate(ratio = n_phds/n_phds[1],
+         log_ratio = log(ratio))
+```
+
+---
+
+# Plotting the differences
+
+We display it as a log so that, for instance, a halving of PhDs looks the same as a doubling in terms of scale.
+
+<div id="htmlwidget-73ceaf115193ced3f144" style="width:100%;height:60%;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-73ceaf115193ced3f144">{"x":{"data":[{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,0.0405735164471665,0.0484943499386106,0.135341347869762,0.124432148769408,0.129901624573944,-0.959660828574248,-1.58489680351798,-1.68020698332231,-1.47953628786016],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Anthropology, generalj","year: 2009<br />log_ratio:  0.040573516<br />field: Anthropology, generalj","year: 2010<br />log_ratio:  0.048494350<br />field: Anthropology, generalj","year: 2011<br />log_ratio:  0.135341348<br />field: Anthropology, generalj","year: 2012<br />log_ratio:  0.124432149<br />field: Anthropology, generalj","year: 2013<br />log_ratio:  0.129901625<br />field: Anthropology, generalj","year: 2014<br />log_ratio: -0.959660829<br />field: Anthropology, generalj","year: 2015<br />log_ratio: -1.584896804<br />field: Anthropology, generalj","year: 2016<br />log_ratio: -1.680206983<br />field: Anthropology, generalj","year: 2017<br />log_ratio: -1.479536288<br />field: Anthropology, generalj"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"Anthropology, generalj","legendgroup":"Anthropology, generalj","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,0.142656300401523,0.20430046351273,0.113328685307003,0.396536477363863,0.534542150383307,0.490622916448471,0.542324290825362,1.63575522075147,0.95807226588911],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Biological and biomedical sciences, general","year: 2009<br />log_ratio:  0.142656300<br />field: Biological and biomedical sciences, general","year: 2010<br />log_ratio:  0.204300464<br />field: Biological and biomedical sciences, general","year: 2011<br />log_ratio:  0.113328685<br />field: Biological and biomedical sciences, general","year: 2012<br />log_ratio:  0.396536477<br />field: Biological and biomedical sciences, general","year: 2013<br />log_ratio:  0.534542150<br />field: Biological and biomedical sciences, general","year: 2014<br />log_ratio:  0.490622916<br />field: Biological and biomedical sciences, general","year: 2015<br />log_ratio:  0.542324291<br />field: Biological and biomedical sciences, general","year: 2016<br />log_ratio:  1.635755221<br />field: Biological and biomedical sciences, general","year: 2017<br />log_ratio:  0.958072266<br />field: Biological and biomedical sciences, general"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(216,144,0,1)","dash":"solid"},"hoveron":"points","name":"Biological and biomedical sciences, general","legendgroup":"Biological and biomedical sciences, general","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,0.0949746656257035,-0.0074074412778618,0.0643078672327313,0.0677621021008187,0.29503504675704,0.428566439381562,0.386842596010163,0.418904528469826,0.687596750029296],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Chemistry, general","year: 2009<br />log_ratio:  0.094974666<br />field: Chemistry, general","year: 2010<br />log_ratio: -0.007407441<br />field: Chemistry, general","year: 2011<br />log_ratio:  0.064307867<br />field: Chemistry, general","year: 2012<br />log_ratio:  0.067762102<br />field: Chemistry, general","year: 2013<br />log_ratio:  0.295035047<br />field: Chemistry, general","year: 2014<br />log_ratio:  0.428566439<br />field: Chemistry, general","year: 2015<br />log_ratio:  0.386842596<br />field: Chemistry, general","year: 2016<br />log_ratio:  0.418904528<br />field: Chemistry, general","year: 2017<br />log_ratio:  0.687596750<br />field: Chemistry, general"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(163,165,0,1)","dash":"solid"},"hoveron":"points","name":"Chemistry, general","legendgroup":"Chemistry, general","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,0.0498137057122192,-0.187172010927704,-0.231918497933327,-0.2438538484826,-0.238721245256079,-0.298492988555997,-0.240429187601235,-0.67186978211266,-0.369817769377927],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Curriculum and instruction","year: 2009<br />log_ratio:  0.049813706<br />field: Curriculum and instruction","year: 2010<br />log_ratio: -0.187172011<br />field: Curriculum and instruction","year: 2011<br />log_ratio: -0.231918498<br />field: Curriculum and instruction","year: 2012<br />log_ratio: -0.243853848<br />field: Curriculum and instruction","year: 2013<br />log_ratio: -0.238721245<br />field: Curriculum and instruction","year: 2014<br />log_ratio: -0.298492989<br />field: Curriculum and instruction","year: 2015<br />log_ratio: -0.240429188<br />field: Curriculum and instruction","year: 2016<br />log_ratio: -0.671869782<br />field: Curriculum and instruction","year: 2017<br />log_ratio: -0.369817769<br />field: Curriculum and instruction"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(57,182,0,1)","dash":"solid"},"hoveron":"points","name":"Curriculum and instruction","legendgroup":"Curriculum and instruction","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,-0.128175193423998,-0.731466044862082,-1.11988968711539,-1.11071531083935,-1.26867842380127,-1.36398860360559,-1.36988832573278,-1.50257476689174,-1.3293030456177],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Educational administration and supervision","year: 2009<br />log_ratio: -0.128175193<br />field: Educational administration and supervision","year: 2010<br />log_ratio: -0.731466045<br />field: Educational administration and supervision","year: 2011<br />log_ratio: -1.119889687<br />field: Educational administration and supervision","year: 2012<br />log_ratio: -1.110715311<br />field: Educational administration and supervision","year: 2013<br />log_ratio: -1.268678424<br />field: Educational administration and supervision","year: 2014<br />log_ratio: -1.363988604<br />field: Educational administration and supervision","year: 2015<br />log_ratio: -1.369888326<br />field: Educational administration and supervision","year: 2016<br />log_ratio: -1.502574767<br />field: Educational administration and supervision","year: 2017<br />log_ratio: -1.329303046<br />field: Educational administration and supervision"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,125,1)","dash":"solid"},"hoveron":"points","name":"Educational administration and supervision","legendgroup":"Educational administration and supervision","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,-0.0076579825428458,-0.424397167224228,-0.885307186354188,-0.84899457341355,-0.96214496852307,-0.955511445027436,-0.931020425019141,-1.04357521631099,-0.97892388565218],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Educational leadership","year: 2009<br />log_ratio: -0.007657983<br />field: Educational leadership","year: 2010<br />log_ratio: -0.424397167<br />field: Educational leadership","year: 2011<br />log_ratio: -0.885307186<br />field: Educational leadership","year: 2012<br />log_ratio: -0.848994573<br />field: Educational leadership","year: 2013<br />log_ratio: -0.962144969<br />field: Educational leadership","year: 2014<br />log_ratio: -0.955511445<br />field: Educational leadership","year: 2015<br />log_ratio: -0.931020425<br />field: Educational leadership","year: 2016<br />log_ratio: -1.043575216<br />field: Educational leadership","year: 2017<br />log_ratio: -0.978923886<br />field: Educational leadership"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"Educational leadership","legendgroup":"Educational leadership","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,0.211649171888475,0.152107778197458,0.0212022076506029,0.315852949418477,0.513678692748397,0.517943091534855,0.551419020731244,1.58923520511658,1.03470848668863],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Mathematics and statistics, general","year: 2009<br />log_ratio:  0.211649172<br />field: Mathematics and statistics, general","year: 2010<br />log_ratio:  0.152107778<br />field: Mathematics and statistics, general","year: 2011<br />log_ratio:  0.021202208<br />field: Mathematics and statistics, general","year: 2012<br />log_ratio:  0.315852949<br />field: Mathematics and statistics, general","year: 2013<br />log_ratio:  0.513678693<br />field: Mathematics and statistics, general","year: 2014<br />log_ratio:  0.517943092<br />field: Mathematics and statistics, general","year: 2015<br />log_ratio:  0.551419021<br />field: Mathematics and statistics, general","year: 2016<br />log_ratio:  1.589235205<br />field: Mathematics and statistics, general","year: 2017<br />log_ratio:  1.034708487<br />field: Mathematics and statistics, general"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,176,246,1)","dash":"solid"},"hoveron":"points","name":"Mathematics and statistics, general","legendgroup":"Mathematics and statistics, general","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,-0.0296987611447495,-0.120171381668683,-0.0932766254685609,-0.237237314390069,-0.196157288646605,-0.159679080044195,-0.218067398282349,-0.358858350919676,-0.230806424059779],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Molecular biology","year: 2009<br />log_ratio: -0.029698761<br />field: Molecular biology","year: 2010<br />log_ratio: -0.120171382<br />field: Molecular biology","year: 2011<br />log_ratio: -0.093276625<br />field: Molecular biology","year: 2012<br />log_ratio: -0.237237314<br />field: Molecular biology","year: 2013<br />log_ratio: -0.196157289<br />field: Molecular biology","year: 2014<br />log_ratio: -0.159679080<br />field: Molecular biology","year: 2015<br />log_ratio: -0.218067398<br />field: Molecular biology","year: 2016<br />log_ratio: -0.358858351<br />field: Molecular biology","year: 2017<br />log_ratio: -0.230806424<br />field: Molecular biology"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(149,144,255,1)","dash":"solid"},"hoveron":"points","name":"Molecular biology","legendgroup":"Molecular biology","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,0.0273648916060146,-0.0146080717733166,0.0694131278495142,0.119882553538666,0.132111722065078,0.153970515877577,0.193191229030859,0.234927566327087,0.171651126462359],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Physics","year: 2009<br />log_ratio:  0.027364892<br />field: Physics","year: 2010<br />log_ratio: -0.014608072<br />field: Physics","year: 2011<br />log_ratio:  0.069413128<br />field: Physics","year: 2012<br />log_ratio:  0.119882554<br />field: Physics","year: 2013<br />log_ratio:  0.132111722<br />field: Physics","year: 2014<br />log_ratio:  0.153970516<br />field: Physics","year: 2015<br />log_ratio:  0.193191229<br />field: Physics","year: 2016<br />log_ratio:  0.234927566<br />field: Physics","year: 2017<br />log_ratio:  0.171651126<br />field: Physics"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(231,107,243,1)","dash":"solid"},"hoveron":"points","name":"Physics","legendgroup":"Physics","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2008,2009,2010,2011,2012,2013,2014,2015,2016,2017],"y":[0,0.0445737137904971,0.0421114853501268,0.082305761605588,0.135545491996224,0.153549417157576,0.161337774050224,0.21459849720662,0.181425097746918,0.179473496815232],"text":["year: 2008<br />log_ratio:  0.000000000<br />field: Social sciences","year: 2009<br />log_ratio:  0.044573714<br />field: Social sciences","year: 2010<br />log_ratio:  0.042111485<br />field: Social sciences","year: 2011<br />log_ratio:  0.082305762<br />field: Social sciences","year: 2012<br />log_ratio:  0.135545492<br />field: Social sciences","year: 2013<br />log_ratio:  0.153549417<br />field: Social sciences","year: 2014<br />log_ratio:  0.161337774<br />field: Social sciences","year: 2015<br />log_ratio:  0.214598497<br />field: Social sciences","year: 2016<br />log_ratio:  0.181425098<br />field: Social sciences","year: 2017<br />log_ratio:  0.179473497<br />field: Social sciences"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(255,98,188,1)","dash":"solid"},"hoveron":"points","name":"Social sciences","legendgroup":"Social sciences","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":23.3059360730594,"r":7.30593607305936,"b":37.2602739726027,"l":37.2602739726027},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[2007.55,2017.45],"tickmode":"array","ticktext":["2010.0","2012.5","2015.0"],"tickvals":[2010,2012.5,2015],"categoryorder":"array","categoryarray":["2010.0","2012.5","2015.0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1.846005093526,1.80155333095516],"tickmode":"array","ticktext":["-1","0","1"],"tickvals":[-1,2.22044604925031e-16,1],"categoryorder":"array","categoryarray":["-1","0","1"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"log_ratio","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.938132733408324},"annotations":[{"text":"field","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"40c03c717215":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"40c03c717215","visdat":{"40c03c717215":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+
+---
+
+# Conclusions
+
+It looks like mathematics and biological sciences are in, and anthropology is out!
+
+---
+
+# Caveats
+
+- When we collected metrics at the beginning, we only went for largest magnitude of changes in terms of raw PhD numbers. It might be better to instead to RATIOS, since that is what we are displaying at the end anyway.
+
+- The method we used favors large changes that may simply be a drop in the bucket for larger fields (physics, social sciences)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
