@@ -17,6 +17,7 @@ options(htmltools.dir.version = FALSE)
 library(tidyverse)
 library(knitr)
 library(plotly)
+library(widgetframe)
 ```
 
 # The Question
@@ -71,7 +72,7 @@ Since they're all on their own scales, it's difficult to see exactly what's goin
 
 ```{r out.width = "100%", out.height = "60%", echo = FALSE}
 a <- ggplot(best_worst, aes(x = year, y = n_phds, color = field)) + geom_line()
-ggplotly(a)
+frameWidget(ggplotly(a))
 ```
 
 ---
@@ -94,7 +95,7 @@ We display it as a log so that, for instance, a halving of PhDs looks the same a
 
 ```{r out.width = "100%", out.height = "60%", echo = FALSE}
 b <- ggplot(best_worst_ratio, aes(x = year, y = log_ratio, color = field)) + geom_line()
-ggplotly(b)
+frameWidget(ggplotly(b))
 ```
 
 ---
