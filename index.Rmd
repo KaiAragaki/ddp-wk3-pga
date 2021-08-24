@@ -1,0 +1,112 @@
+---
+title: "Is anyone here a doctor (of philosophy?)"
+subtitle: "Investigating PhDs over time"
+author: "Kai Aragaki"
+date: "2021-08-24"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(tidyverse)
+library(knitr)
+library(plotly)
+```
+
+# The Question
+
+- Which PhDs are rising in popularity? 
+- Which are becoming less popular?
+
+---
+
+# The Data
+
+- These data were obtained from the [NSF](https://ncses.nsf.gov/pubs/nsf19301/data), with a tidying script from the [TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-02-19) repository.
+
+---
+
+# The Data: A peek
+
+```{r, echo = FALSE}
+if (!file.exists("./data/phds.csv")) {
+  download.file("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-19/phd_by_field.csv", destfile = "./data/phds.csv")
+}
+
+phd_field <- read_csv("./data/phds.csv", show_col_types = FALSE)
+head(phd_field) |> kable()
+```
+
+---
+
+# Finding the biggest differences
+
+```{r}
+phd_field <- phd_field |> 
+  group_by(field) |> 
+  dplyr::arrange(year) |> 
+  mutate(diff = n_phds[n()] - n_phds[1]) |> 
+  filter(!is.na(diff)) |> 
+  arrange(diff) |> 
+  nest()
+
+
+best_worst <- bind_rows(head(phd_field, 5), tail(phd_field, 5)) |> 
+  unnest(cols = c(data))
+
+head(best_worst) |> kable()
+```
+
+---
+
+# Plotting the differences
+
+Since they're all on their own scales, it's difficult to see exactly what's going on...
+
+```{r out.width = "100%", out.height = "60%", echo = FALSE}
+a <- ggplot(best_worst, aes(x = year, y = n_phds, color = field)) + geom_line()
+ggplotly(a)
+```
+
+---
+
+# Plotting the differences
+
+We can make a new metric by dividing every number by it's first year's value for that field
+
+```{r}
+best_worst_ratio <- best_worst |> 
+  mutate(ratio = n_phds/n_phds[1],
+         log_ratio = log(ratio))
+```
+
+---
+
+# Plotting the differences
+
+We display it as a log so that, for instance, a halving of PhDs looks the same as a doubling in terms of scale.
+
+```{r out.width = "100%", out.height = "60%", echo = FALSE}
+b <- ggplot(best_worst_ratio, aes(x = year, y = log_ratio, color = field)) + geom_line()
+ggplotly(b)
+```
+
+---
+
+# Conclusions
+
+It looks like mathematics and biological sciences are in, and anthropology is out!
+
+---
+
+# Caveats
+
+- When we collected metrics at the beginning, we only went for largest magnitude of changes in terms of raw PhD numbers. It might be better to instead to RATIOS, since that is what we are displaying at the end anyway.
+
+- The method we used favors large changes that may simply be a drop in the bucket for larger fields (physics, social sciences)
